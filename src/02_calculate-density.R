@@ -83,7 +83,7 @@ df_events <- df_data |>
   # Create field field with demographic categories
   mutate(demo_category = paste0(common_name, " ", age_class, " ", sex)) |>
   # Delineate series, with 4 categories of moose (Juv, Adult-Male, Adult-Female, Adult-Unkn)
-  arrange(project, location, demo_category, date_detected) %>%
+  arrange(project, location, demo_category, date_detected) |>
   mutate(series_num = 0,
          date_detected_lag = lag(date_detected),
          date_detected_lead = lead(date_detected),
@@ -110,8 +110,8 @@ df_events <- df_data |>
          diff_time_lead_adj = ifelse(lead(gap_prob == 1), diff_time_lead * (1 - lead(pred)), diff_time_lead))
 
 # Calculate total time in front of the camera, by series (tts = Total Time by Series)
-df_tts <- df_events %>%
-  group_by(series_num) %>%
+df_tts <- df_events |>
+  group_by(series_num) |>
   mutate(# Check whether the image was first or last in a series
     bookend = ifelse(row_number() == 1 | row_number() == n(), 1, 0),
     # Calculate time for each individual image
@@ -119,30 +119,30 @@ df_tts <- df_events %>%
                         ((diff_time_lag_adj + diff_time_lead_adj) / 2) + (tbp_moose / 2),
                         (diff_time_lag_adj + diff_time_lead_adj) / 2),
     # Multiply image time by the number of animals present
-    image_time_ni = image_time * number_individuals) %>%
+    image_time_ni = image_time * number_individuals) |>
   # Group by common name as well to add it as a variable to output
-  group_by(demo_category, .add = TRUE) %>%
+  group_by(demo_category, .add = TRUE) |>
   # Calculate total time and number of images for each series
   summarise(n_images = n(),
-            series_total_time = sum(image_time_ni)) %>%
+            series_total_time = sum(image_time_ni)) |>
   ungroup()
 
 # Calculate total time in front of camera, by deployment, project, and species (tt = total time)
 
-df_tt <- df_events %>%
-  group_by(series_num) %>%
-  arrange(date_detected, .by_group = TRUE) %>%
-  filter(row_number() == 1) %>%
-  left_join(df_tts, by = c("series_num", "demo_category")) %>%
-  select(project, location, date_detected, demo_category, series_num, series_total_time) %>%
-  ungroup() %>%
+df_tt <- df_events |>
+  group_by(series_num) |>
+  arrange(date_detected, .by_group = TRUE) |>
+  filter(row_number() == 1) |>
+  left_join(df_tts, by = c("series_num", "demo_category")) |>
+  select(project, location, date_detected, demo_category, series_num, series_total_time) |>
+  ungroup() |>
   mutate(julian = as.numeric(format(date_detected, "%j")),
-         season = ifelse(julian >= summer.start.j & julian <= summer.end.j, "summer", "winter")) %>%
-  unite(location, project, col = "location_project", sep = "_", remove = TRUE) %>%
-  mutate_at(c("location_project", "demo_category", "season"), factor) %>%
-  group_by(location_project, demo_category, season, .drop = FALSE) %>%
-  summarise(total_duration = sum(series_total_time)) %>%
-  ungroup() %>%
+         season = ifelse(julian >= summer.start.j & julian <= summer.end.j, "summer", "winter")) |>
+  unite(location, project, col = "location_project", sep = "_", remove = TRUE) |>
+  mutate_at(c("location_project", "demo_category", "season"), factor) |>
+  group_by(location_project, demo_category, season, .drop = FALSE) |>
+  summarise(total_duration = sum(series_total_time)) |>
+  ungroup() |>
   mutate_if(is.factor, as.character)
 
 # Demographic categories
@@ -158,7 +158,7 @@ df_tt_nm <- dep |>
 df_tt_full <- bind_rows(df_tt, df_tt_nm) |>
   arrange(location_project, demo_category, season) |>
   left_join(df_tbd, by = "location_project") |>
-  mutate(total_season_days = ifelse(season == "summer", total_summer_days, total_winter_days)) %>%
+  mutate(total_season_days = ifelse(season == "summer", total_summer_days, total_winter_days)) |>
   select(location_project:season, total_season_days, total_duration)
 
 #-----------------------------------------------------------------------------------------------------------------------
