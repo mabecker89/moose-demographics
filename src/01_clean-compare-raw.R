@@ -109,10 +109,10 @@ df_new_am <- df_new |>
   mutate(data = "new")
 
 # Save new data
-write_csv(df_new_am, "./data/clean/abmi-eh1516-moose_clean.csv")
+write_csv(df_new_am, "./data/clean/abmi-eh151617-moose_clean.csv")
 
 # Save deployment location names
-write_csv(all_dep, "./data/lookup/abmi-eh1516_deployments.csv")
+write_csv(all_dep, "./data/lookup/abmi-eh151617_deployments.csv")
 
 #-----------------------------------------------------------------------------------------------------------------------
 

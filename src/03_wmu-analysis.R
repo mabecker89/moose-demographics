@@ -30,7 +30,7 @@ df_aerial <- read_csv("./data/raw/aerial-surveys_osr_moose-ratios.csv")
 # ^ Note: We need more aerial survey data from WMUs in different parts of the province.
 
 # Moose densities at the deployment level (processed in the previous script)
-df_dep_density <- read_csv("./data/processed/abmi_eh1516_moose_density-deployment.csv")
+df_dep_density <- read_csv("./data/processed/abmi_eh151617_moose_density-deployment.csv")
 
 #-----------------------------------------------------------------------------------------------------------------------
 

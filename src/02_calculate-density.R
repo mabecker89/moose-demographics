@@ -22,14 +22,14 @@ root <- "G:/Shared drives/ABMI Camera Mammals/"
 # Import data and lookup tables/values:
 
 # Moose tags
-df_data <- read_csv("./data/clean/abmi-eh1516-moose_clean.csv") |>
+df_data <- read_csv("./data/clean/abmi-eh151617-moose_clean.csv") |>
   # Only want images within range of field of view
   filter(field_of_view == "WITHIN") |>
   # Only care about certain columns
   select(project, location, date_detected, common_name, age_class, sex, number_individuals)
 
 # Deployments in the 2015-2016 projects
-dep <- read_csv("./data/lookup/abmi-eh1516_deployments.csv") |>
+dep <- read_csv("./data/lookup/abmi-eh151617_deployments.csv") |>
   unite(location, project, col = "location_project", sep = "_", remove = TRUE)
 
 # Gap classes (processed elsewhere)
@@ -55,7 +55,7 @@ tbp_moose <- read_csv(paste0(root, "data/processed/time-btwn-images/abmi-all-yea
 
 # Number of operating days by deployment and season (tbd = time by day)
 df_tbd <- read_csv(paste0(root, "data/processed/time-by-day/abmi-cmu_all-years_tbd-summary_2021-10-07.csv")) |>
-  filter(str_detect(project, "Health 2015|Health 2016")) |>
+  filter(str_detect(project, "Health 2015|Health 2016|Health 2017")) |>
   unite(location, project, col = "location_project", sep = "_", remove = TRUE)
 
 # Seasonal start/end dates (julian day):
@@ -167,7 +167,7 @@ df_tt_full <- bind_rows(df_tt, df_tt_nm) |>
 
 # VegHF categories lookup:
 df_veghf <- read_csv(paste0(root, "data/lookup/veghf/abmi-cmu_all-years_veghf-soilhf-detdistveg_2021-10-06.csv")) |>
-  filter(str_detect(project, "Health 2015|Health 2016")) |>
+  filter(str_detect(project, "Health 2015|Health 2016|Health 2017")) |>
   select(project, location, VegForDetectionDistance) |>
   distinct() |>
   unite(location, project, col = "location_project", sep = "_", remove = TRUE)
@@ -198,7 +198,7 @@ df_dep_density <- df_tt_full |>
   select(location_project, demo_category, season, total_season_days, total_duration, density_km2 = cpue_km2)
 
 # Write results
-write_csv(df_dep_density, "./data/processed/abmi_eh1516_moose_density-deployment.csv")
+write_csv(df_dep_density, "./data/processed/abmi_eh151617_moose_density-deployment.csv")
 
 # Calculate density at each 'site' - i.e., the average of the four density values from each quadrant (NW, NE, SW, SE)
 
@@ -224,6 +224,6 @@ df_site_density <- df_dep_density |>
             n_deployments = n())
 
 # Write results
-write_csv(df_site_density, "./data/processed/abmi_eh1516_moose_density-site.csv")
+write_csv(df_site_density, "./data/processed/abmi_eh151617_moose_density-site.csv")
 
 #-----------------------------------------------------------------------------------------------------------------------
